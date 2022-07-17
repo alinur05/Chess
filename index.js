@@ -1,14 +1,59 @@
-import { createElement, getCoordinates, x_indexes} from "./utiles.js"
+import { pieces, createElement, findPiece, getBishopsMoves, getCoordinates, getKingsMoves, getKnightsMoves, getPawnsMoves, getQueensMoves, getRookMoves, x_indexes} from "./utiles.js"
+
+
+
 
 
 const board = document.getElementById("board")
+let moveOf = "white"
+let move = []
+
+board.addEventListener("click", e => {
+    const coordinates = e.target["id"]
+
+    // FIRST CLICK
+    if(coordinates.length === 3 && !move.length ) {
+
+        const pos = coordinates.slice(1,3)
+        const piece = findPiece(pos)
+           
+        if(piece.color === moveOf) {
+            move.push(piece)
+            // console.log(move[0].available_moves)
+            renderBoard()
+        }else {
+            move = []
+        }
+    // SECOND CLICK
+    }else if(coordinates.length == 2) {
+        if(move.length === 1 && move[0].available_moves.includes(coordinates)) {
+            move.push(coordinates)
+
+            pieces.forEach(piece => {
+                if(piece.position === move[0].position) {
+                    piece.position = move[1]
+                }   
+            })
+
+            move = []
+            renderBoard()
+            moveOf = moveOf === "white" ? "black": "white"
+        }else {
+            move = []
+        }
+    }else {
+        move = []
+    }
+})
 
 
-function setup() {
+function renderBoard() {
+    board.innerHTML = ''
     let isOdd = true
     let y_index = 8
     let x_index = 0
 
+    // Board rendering and pieces setting
     Array.from(new Array(64)).forEach((square, index, array) => {
         const squareNode = createElement("div", `squareNode ${isOdd ? "odd":"even"}`)
 
@@ -24,18 +69,64 @@ function setup() {
                 x_index += 1
             }
 
-            squareNode.setAttribute("name", getCoordinates(index))
+            let coordinates = getCoordinates(index)
+
+            pieces.forEach(piece => {
+                if(coordinates === piece.position) {
+                    squareNode.setAttribute("piece_color", piece.color)
+                    squareNode.style.backgroundImage = `url(${piece.img})`
+                    squareNode.style.backgroundSize = "contain"
+                    squareNode.style.cursor = "pointer"
+                    squareNode.style.backgroundRepeat = "no-repeat"
+                    coordinates = piece.name !== "Knight" ? piece.name[0] + coordinates : "N" + coordinates
+                }
+            })
+            
+            squareNode.setAttribute("id", coordinates)
+
+            if(move[0]?.available_moves.includes(coordinates)) {
+                const circle = createElement("div", 'available_move_mark')
+                squareNode.appendChild(circle)
+            }
+
+            squareNode.setAttribute('color', isOdd ? "white":"black")
 
         board.appendChild(squareNode)
 
         if((index + 1) % 8 !== 0) {
-            isOdd = !isOdd            
+            isOdd = !isOdd
         }
-
-        squareNode.addEventListener("click", (e) => console.log(e.target.getAttribute("name")))
     })
 
+    setAvailableMoves()
+}
+
+const setAvailableMoves = () => {
+    pieces.forEach(piece => {
+        switch(piece.name) {
+            case "Rook":
+                piece.available_moves = getRookMoves(piece.position)
+                break
+            case "Pawn":
+                piece.available_moves = getPawnsMoves(piece.position, piece.color)
+                break
+            case "Knight":
+                piece.available_moves = getKnightsMoves(piece.position)
+                break
+            case "Bishop":
+                piece.available_moves = getBishopsMoves(piece.position, piece.color)
+                break
+            case "Queen":
+                piece.available_moves = getQueensMoves(piece.position)
+                break
+            case "King":
+                piece.available_moves = getKingsMoves(piece.position)
+                break
+            default:
+                piece.available_moves = []
+        }
+    })
 }
 
 
-setup()
+renderBoard()

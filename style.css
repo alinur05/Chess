@@ -32,8 +32,8 @@
     width: 100%;
     height: 75px;
     border: 1px solid #e3e3e3;
-    cursor: pointer;
     position: relative;
+    user-select: none;
 }
 .squareNode.odd {
     background: #e3e3e3
@@ -62,4 +62,20 @@
 }
 .squareNode.even .x-index {
     color: #e3e3e3;
+}
+
+button {
+    cursor: pointer;
+    margin: 5px;
+}
+.available_move_mark {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 38%;
+    left: 38%;
+    border-radius: 100px;
+    background-color: rgb(97, 97, 97);
+    opacity: 0.6;
+    pointer-events: none;
 }
