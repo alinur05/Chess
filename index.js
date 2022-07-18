@@ -1,4 +1,10 @@
-import { pieces, createElement, findPiece, getBishopsMoves, getCoordinates, getKingsMoves, getKnightsMoves, getPawnsMoves, getQueensMoves, getRookMoves, x_indexes} from "./utiles.js"
+import { getBishopsMoves } from "./moves/Bishop.js"
+import { getKingsMoves } from "./moves/King.js"
+import { getKnightsMoves } from "./moves/Knight.js"
+import { getPawnsMoves } from "./moves/Pawn.js"
+import { getQueensMoves } from "./moves/Queen.js"
+import { getRookMoves } from "./moves/Rook.js"
+import { pieces, createElement, findPiece, getCoordinates, x_indexes} from "./utiles.js"
 
 
 
@@ -70,6 +76,7 @@ function renderBoard() {
             }
 
             let coordinates = getCoordinates(index)
+            squareNode.setAttribute("square_id", coordinates)
 
             pieces.forEach(piece => {
                 if(coordinates === piece.position) {
@@ -83,6 +90,7 @@ function renderBoard() {
             })
             
             squareNode.setAttribute("id", coordinates)
+            
 
             if(move[0]?.available_moves.includes(coordinates)) {
                 const circle = createElement("div", 'available_move_mark')
